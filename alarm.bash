@@ -16,8 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 now=$(date +%s)
+frecuency=0.5
 
-while getopts ":d:m:" opt; do
+while getopts ":d:m:f:" opt; do
 	case $opt in
 		d)
 			deadline=$(date -d "$OPTARG" +%s)
@@ -39,6 +40,15 @@ while getopts ":d:m:" opt; do
 				exit 1	
 			fi
 			;;
+		f)
+			pos_num_regex='^[0-9]+([.][0-9]+)?$'
+			if ! [[ $OPTARG =~ $pos_num_regex ]]; then
+				echo "La frecencia debe ser un número positivo."
+				exit 1
+			else
+				frecuency=$OPTARG
+			fi
+			;;
 		:)
 			echo "La opción -$OPTARG requiere un valor."
 			exit 1
@@ -54,4 +64,9 @@ while [ $sec_left -gt 0 ]; do
 	echo "$sec_left segundos restantes."
         sleep 1
 done
-echo -e '\a'		
+while [ -z "$stop" ]; do 
+	clear
+	echo "Pulsa una letra para continuar."
+ 	echo -ne "\a"
+	read -n1 -t$frecuency stop; 
+done
