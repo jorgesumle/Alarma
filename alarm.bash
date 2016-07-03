@@ -15,11 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+usage(){
+	echo "Alarma es un programa de línea de órdenes que puede ser utilizado como alarma."
+	echo
+	echo "Uso: alarma [OPCIÓN]... [TIEMPO]"
+}
+
 now=$(date +%s)
 frecuency=0.5
 
-while getopts ":d:m:f:" opt; do
+while getopts ":-:d:m:f:" opt; do
 	case $opt in
+		-)
+			if [ $OPTARG = "version" ]; then
+				echo "Alarma 0.1"
+				exit
+			elif [ $OPTARG = "help" ]; then
+				usage	
+				exit
+			fi
+			;;
 		d)
 			deadline=$(date -d "$OPTARG" +%s)
 			sec_left=$(($deadline-$now))
