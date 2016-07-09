@@ -16,9 +16,34 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 usage(){
-	echo "Alarma es un programa de línea de órdenes que puede ser utilizado como alarma."
-	echo
-	echo "Uso: alarma [OPCIÓN]... [TIEMPO]"
+	cat << _EOF_
+Modo de empleo: alarma [OPCIÓN]... [TIEMPO]
+
+Alarma obtiene el momento  actual a partir de la instrucción date +%s. A partir del momento actual  y del  momento de activación de la alarma indicado, se iniciar una cuenta atrás. Si no se indica el  tiempo para  la activación, la alarma se activar de inmediato.
+
+El sonido de la alarma es el mismo que  utiliza  el sistema  operativo como alerta (echo -ne ""). Si no está activado, no sonar nada cuando acabe la  cuenta atrás  de la alarma; pero aparecer la pantalla de la alarma. Para salir de esta pantalla, se debe pulsar cualquier  tecla  excepto  la  BARRA  ESPACIADORA o ENTER.
+
+       -d     Establece el momento de activación a una fecha (e.g. 14:06, mar jul  5 02:50:14 CEST 2016)
+
+       -f     La frecuencia a la que suena la alarma una vez activada en segundos
+
+       -m     La alarma se activará en el número de minutos indicado
+
+       --version
+              Muestra la información de la versión y sale del programa.
+
+       --help Muestra la información de la ayuda y sale del programa.
+
+AUTOR
+       Escrito por Jorge Maldonado Ventura.
+
+INFORMAR DE ERRORES
+       Envíe, por favor, los errores y sugerencias a <jorgesumle@freakspot.net>.
+
+COPYRIGHT
+       Copyright © 2016 Free Software Foundation, Inc.  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+       This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the extent permitted by law.
+_EOF_
 }
 
 now=$(date +%s)
