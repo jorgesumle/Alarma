@@ -19,20 +19,26 @@ usage(){
 	cat << _EOF_
 Modo de empleo: alarma [OPCIÓN]... [TIEMPO]
 
-Alarma obtiene el momento  actual a partir de la instrucción date +%s. A partir del momento actual  y del  momento de activación de la alarma indicado, se iniciar una cuenta atrás. Si no se indica el  tiempo para  la activación, la alarma se activar de inmediato.
+Alarma obtiene el momento  actual a partir de la instrucción 'date +%s'. A partir del momento actual  y del  momento de activación de la alarma indicado, se iniciar una cuenta atrás. Si no se indica el  tiempo para  la activación, la alarma se activar de inmediato.
 
-El sonido de la alarma es el mismo que  utiliza  el sistema  operativo como alerta (echo -ne ""). Si no está activado, no sonar nada cuando acabe la  cuenta atrás  de la alarma; pero aparecer la pantalla de la alarma. Para salir de esta pantalla, se debe pulsar cualquier  tecla  excepto  la  BARRA  ESPACIADORA o ENTER.
+El sonido de la alarma es el mismo que  utiliza  el sistema  operativo como alerta ('echo -ne ""'). Si no está activado, no sonar nada cuando acabe la  cuenta atrás  de la alarma; pero aparecer la pantalla de la alarma. Para salir de esta pantalla, se debe pulsar cualquier  tecla  excepto  la  BARRA  ESPACIADORA o ENTER.
+
+Se pueden combinar diferentes opciones para establecer el tiempo de activación de la alarma. Incluso se puede restar tiempo a la alarma tras establecer el tiempo de activación en una unidad de mayor duración (por ejemplo, 'alarma -m 1 -s -30' activa la alarma en 30 segundos). La opción -d también permite hacer uso de esta funcionalidad. 
 
        -d     Establece el momento de activación a una fecha (e.g. 14:06, mar jul  5 02:50:14 CEST 2016)
 
        -f     La frecuencia a la que suena la alarma una vez activada en segundos
 
+       -h     La alarma se activará en el número de horas indicado
+
        -m     La alarma se activará en el número de minutos indicado
 
-       --version
-              Muestra la información de la versión y sale del programa.
+       -s     La alarma se activará en el número de segundos indicado
 
-       --help Muestra la información de la ayuda y sale del programa.
+       --version
+              Muestra la información de la versión y sale del programa
+
+       --help Muestra esta ayuda y sale del programa
 
 AUTOR
        Escrito por Jorge Maldonado Ventura.
@@ -46,14 +52,19 @@ COPYRIGHT
 _EOF_
 }
 
+pos_num_req_error (){
+	echo "$OPTARG no es un número positivo. Para esta opción solo es admisible un número positivo."
+	exit 1
+}
+
 now=$(date +%s)
 frecuency=0.5
 
-while getopts ":-:d:m:f:" opt; do
+while getopts ":-:d:h:m:s:f:" opt; do
 	case $opt in
 		-)
 			if [ $OPTARG = "version" ]; then
-				echo "Alarma 0.1"
+				echo "Alarma 0.2"
 				exit
 			elif [ $OPTARG = "help" ]; then
 				usage	
@@ -68,6 +79,17 @@ while getopts ":-:d:m:f:" opt; do
 				exit 1
 			fi
 			;;
+		h)
+			if [[ -z $deadline ]]; then
+				deadline=$((now+(60*60*$OPTARG)))
+			else
+				deadline=$((deadline+(60*60*$OPTARG)))
+			fi
+			sec_left=$(($deadline-$now))
+			if [ $sec_left -lt 1 ]; then
+				pos_num_req_error
+			fi
+			;;
 		m)
 			if [[ -z $deadline ]]; then
 				deadline=$((now+(60*$OPTARG)))
@@ -76,15 +98,24 @@ while getopts ":-:d:m:f:" opt; do
 			fi
 			sec_left=$(($deadline-$now))
 			if [ $sec_left -lt 1 ]; then
-				echo "$OPTARG no es un número positivo."
-				exit 1	
+				pos_num_req_error 
+			fi
+			;;
+		s)
+			if [[ -z $deadline ]]; then
+				deadline=$((now+$OPTARG))
+			else
+				deadline=$((deadline+$OPTARG))
+			fi
+			sec_left=$(($deadline-$now))
+			if [ $sec_left -lt 1 ]; then
+				pos_num_req_error 
 			fi
 			;;
 		f)
 			pos_num_regex='^[0-9]+([.][0-9]+)?$'
 			if ! [[ $OPTARG =~ $pos_num_regex ]]; then
-				echo "La frecencia debe ser un número positivo."
-				exit 1
+				pos_num_req_error
 			else
 				frecuency=$OPTARG
 			fi
